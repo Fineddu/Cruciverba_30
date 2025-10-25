@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cruciverba Nintendo</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #e60012 0%, #ff6b6b 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            max-width: 900px;
+        }
+        h1 {
+            text-align: center;
+            color: #e60012;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        .crossword {
+            display: grid;
+            grid-template-columns: repeat(23, 30px);
+            gap: 2px;
+            margin: 20px auto;
+            width: fit-content;
+        }
+        .cell {
+            width: 30px;
+            height: 30px;
+            border: 2px solid #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 16px;
+            text-transform: uppercase;
+            background: white;
+            position: relative;
+        }
+        .cell.black {
+            background: #333;
+            border: none;
+        }
+        .cell.highlight {
+            background: #ffeb3b;
+        }
+        .cell input {
+            width: 100%;
+            height: 100%;
+            border: none;
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+            text-transform: uppercase;
+            background: transparent;
+        }
+        .cell input:focus {
+            outline: 2px solid #e60012;
+        }
+        .number {
+            position: absolute;
+            top: 1px;
+            left: 2px;
+            font-size: 8px;
+            color: #666;
+        }
+        .clues {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .clue-section h3 {
+            color: #e60012;
+            margin-bottom: 10px;
+        }
+        .clue {
+            margin-bottom: 8px;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        .clue strong {
+            color: #e60012;
+        }
+        button {
+            background: #e60012;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 16px;
+            border-radius: 25px;
+            cursor: pointer;
+            display: block;
+            margin: 20px auto;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+        button:hover {
+            transform: scale(1.05);
+            background: #cc0010;
+        }
+        .message {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 20px;
+            min-height: 25px;
+        }
+        .success {
+            color: #4caf50;
+        }
+        .error {
+            color: #f44336;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎮 Cruciverba Nintendo 🎂</h1>
+        <div class="subtitle">Risolvi il cruciverba e scopri il messaggio segreto nelle celle gialle!</div>
+        
+        <div class="crossword" id="crossword"></div>
+        
+        <button onclick="checkSolution()">Controlla Soluzione</button>
+        <div class="message" id="message"></div>
+        
+        <div class="clues">
+            <div class="clue-section">
+                <h3>Orizzontali</h3>
+                <div class="clue"><strong>1.</strong> L'idraulico più famoso di Nintendo</div>
+                <div class="clue"><strong>4.</strong> La principessa del Regno dei Funghi</div>
+                <div class="clue"><strong>5.</strong> Il regno di Hyrule è la sua casa</div>
+                <div class="clue"><strong>7.</strong> Console portatile ibrida di Nintendo</div>
+                <div class="clue"><strong>9.</strong> Pokémon elettrico mascotte</div>
+                <div class="clue"><strong>10.</strong> Rivale di Mario in rosso</div>
+            </div>
+            <div class="clue-section">
+                <h3>Verticali</h3>
+                <div class="clue"><strong>1.</strong> Cacciatrice di taglie dello spazio</div>
+                <div class="clue"><strong>2.</strong> Scimmia protagonista della serie di Rare</div>
+                <div class="clue"><strong>3.</strong> Serie di combattimenti con personaggi Nintendo</div>
+                <div class="clue"><strong>6.</strong> Dinosauro verde amico di Mario</div>
+                <div class="clue"><strong>8.</strong> Avventure in giardino con questo capitano</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const grid = [
+            ['M','A','R','I','O','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B'],
+            ['E','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B'],
+            ['T','B','P','E','A','C','H','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B'],
+            ['R','B','R','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B'],
+            ['O','B','I','B','Z','E','L','D','A','B','B','B','B','B','B','B','B','B','B','B','B','B','B'],
+            ['I','B','M','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B'],
+            ['D','O','E','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B'],
+            ['B','N','B','S','W','I','T','C','H','B','B','B','B','B','B','B','B','B','B','B','B','B','B'],
+            ['P','G','B','M','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B'],
+            ['I','B','B','A','B','P','I','K','A','C','H','U','B','B','B','B','B','B','B','B','B','B','B'],
+            ['K','B','B','S','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B'],
+            ['A','B','B','H','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B'],
+            ['C','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B'],
+            ['H','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B'],
+            ['U','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B'],
+            ['B','B','B','B','B','Y','O','S','H','I','B','B','B','B','B','B','B','B','B','B','B','B','B'],
+            ['4','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B'],
+            [':','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B'],
+            ['B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B'],
+            ['B','B','B','B','B','B','B','O','L','I','M','A','R','B','B','B','B','B','B','B','B','B','B'],
+            ['E','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B'],
+            ['Y','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B'],
+            ['O','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B'],
+            ['N','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B'],
+            ['D','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B'],
+            ['B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B'],
+            ['W','A','L','U','I','G','I','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B','B']
+        ];
+
+        const highlights = [
+            [0,0],[1,0],[2,0],[3,0],[4,0],[5,0],[6,0],[8,0],[9,8],[10,8],[11,8],[12,8],
+            [16,0],[17,0],[20,0],[21,0],[22,0],[23,0],[24,0]
+        ];
+
+        const numbers = {
+            '0,0': '1', '2,0': '2', '2,2': '3', '4,4': '5', '6,1': '4',
+            '7,3': '7', '15,5': '6', '9,5': '9', '19,7': '8', '26,0': '10'
+        };
+
+        const crosswordEl = document.getElementById('crossword');
+
+        for (let r = 0; r < grid.length; r++) {
+            for (let c = 0; c < grid[r].length; c++) {
+                const cell = document.createElement('div');
+                cell.className = 'cell';
+                
+                if (grid[r][c] === 'B') {
+                    cell.classList.add('black');
+                } else {
+                    const isHighlight = highlights.some(([hr, hc]) => hr === r && hc === c);
+                    if (isHighlight) {
+                        cell.classList.add('highlight');
+                    }
+                    
+                    const input = document.createElement('input');
+                    input.maxLength = 1;
+                    input.dataset.row = r;
+                    input.dataset.col = c;
+                    input.dataset.answer = grid[r][c];
+                    cell.appendChild(input);
+                    
+                    const key = `${r},${c}`;
+                    if (numbers[key]) {
+                        const numSpan = document.createElement('span');
+                        numSpan.className = 'number';
+                        numSpan.textContent = numbers[key];
+                        cell.appendChild(numSpan);
+                    }
+                }
+                
+                crosswordEl.appendChild(cell);
+            }
+        }
+
+        function checkSolution() {
+            const inputs = document.querySelectorAll('.cell input');
+            let correct = true;
+            
+            inputs.forEach(input => {
+                const userAnswer = input.value.toUpperCase();
+                const correctAnswer = input.dataset.answer;
+                
+                if (userAnswer !== correctAnswer) {
+                    correct = false;
+                }
+            });
+            
+            const messageEl = document.getElementById('message');
+            if (correct) {
+                messageEl.textContent = '🎉 Perfetto! Il messaggio è: METROID PRIME 4: BEYOND';
+                messageEl.className = 'message success';
+            } else {
+                messageEl.textContent = '❌ Qualche errore... Riprova!';
+                messageEl.className = 'message error';
+            }
+        }
+    </script>
+</body>
+</html>
